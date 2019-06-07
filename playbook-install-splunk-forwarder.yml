@@ -1,0 +1,32 @@
+---
+- hosts: all
+  gather_facts: no
+  tasks:
+    - name: Check installation
+      stat:
+        path: /opt/splunkforwarder
+      register: splunk_forwarder_installed
+    - name: Check init script
+      stat:
+        path: /etc/init.d/splunk
+      register: splunk_forwarder_init
+    - name: Install universal forwarder
+      become: true
+      unarchive:
+        src: files/splunkforwarder-7.3.0-657388c7a488-Linux-arm.tgz
+        dest: /opt
+      when: splunk_forwarder_installed.stat.exists == False
+    - name: Configure universal forwarder
+      become: true
+      copy: src={{ item.src }} dest={{ item.dest }}
+      with_items:
+        - { src: 'files/deploymentclient.conf', dest: '/opt/splunkforwarder/etc/system/local/deploymentclient.conf' }
+        - { src: 'files/user-seed.conf', dest: '/opt/splunkforwarder/etc/system/default/user-seed.conf' }
+    - name: Start universal forwarder
+      become: true
+      command: "{{ item }}"
+      with_items:
+        - chown -R root:root /opt/splunkforwarder
+        - /opt/splunkforwarder/bin/splunk start --accept-license
+        - /opt/splunkforwarder/bin/splunk enable boot-start --accept-license
+      when: splunk_forwarder_init.stat.exists == False
