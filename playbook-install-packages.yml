@@ -1,0 +1,12 @@
+---
+- hosts: all
+  gather_facts: no
+  tasks:
+    - name: Install additional packages
+      become: true
+      apt:
+        name: "{{ packages }}"
+      vars:
+        packages:
+        - iperf3
+        - ntp
