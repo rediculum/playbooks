@@ -1,0 +1,17 @@
+- hosts: all
+  become: true
+  gather_facts: true
+  tasks:
+  - name: OS update
+    package:
+      name: "*"
+      state: latest
+  - name: needs-restarting?
+    shell: needs-restarting -r
+    failed_when: false
+    register: reboot_required
+    changed_when: false
+  - when: reboot_required.rc != 0
+    block:
+    - name: rebooting
+      reboot:
