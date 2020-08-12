@@ -1,0 +1,18 @@
+---
+- hosts: nullclient
+  become: true
+  gather_facts: false
+  tasks:
+  - name: rsyslog elastic package
+    package:
+      name: rsyslog-elasticsearch
+  - name: Copy 40-elastic.conf
+    copy:
+      src: files/rsyslog.d/40-elastic.conf
+      dest: /etc/rsyslog.d/40-elastic.conf
+    register: filecopy
+  - name: Restart rsyslogd
+    service:
+      name: rsyslog
+      state: restarted
+    when: filecopy.changed

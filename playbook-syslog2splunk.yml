@@ -1,0 +1,15 @@
+---
+- hosts: nullclient
+  become: true
+  gather_facts: false
+  tasks:
+  - name: Copy 30-splunk.conf
+    copy:
+      src: files/rsyslog.d/30-splunk.conf
+      dest: /etc/rsyslog.d/30-splunk.conf
+    register: filecopy
+  - name: Restart rsyslogd
+    service:
+      name: rsyslog
+      state: restarted
+    when: filecopy.changed
