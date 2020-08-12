@@ -1,8 +1,9 @@
 ---
 - hosts: all
-- gather_facts: yes
-- tasks:
+  gather_facts: yes
+  become: true
+  tasks:
   - name: Set hostname
-    become: true
-    command: hostnamectl set-hostname {{ inventory_hostname }}
+    hostname:
+      name: {{ inventory_hostname }}
     when: ansible_hostname != inventory_hostname
