@@ -1,0 +1,10 @@
+---
+- hosts: all
+  become: true
+  gather_facts: false
+  tasks:
+  - name: Upgrade acme.sh
+    ansible.builtin.command: bash /root/.acme.sh/acme.sh upgrade
+    register: output
+
+  - debug: var=output.stdout_lines
